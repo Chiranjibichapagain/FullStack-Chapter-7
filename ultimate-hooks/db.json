@@ -7,6 +7,14 @@
     {
       "content": "paras feature ikinä <3",
       "id": 2
+    },
+    {
+      "content": "New note",
+      "id": 3
+    },
+    {
+      "content": "very new note",
+      "id": 4
     }
   ],
   "persons": [
@@ -16,14 +24,9 @@
       "id": 1
     },
     {
-      "name": "Chiranjibi",
-      "number": "0451405566",
+      "name": "Chiran",
+      "number": "76545788",
       "id": 2
-    },
-    {
-      "name": "kaji prasad",
-      "number": "2345676543",
-      "id": 3
     }
   ]
 }

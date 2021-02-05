@@ -1,42 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 
-const useField = (type) => {
-  const [value, setValue] = useState("");
-
-  const onChange = (event) => {
-    setValue(event.target.value);
-  };
-
-  return {
-    type,
-    value,
-    onChange,
-  };
-};
-
-const useResource = (baseUrl) => {
-  const [resources, setResources] = useState([]);
-
-  useEffect(() => {
-    axios.get(baseUrl).then((response) => {
-      setResources(response.data);
-    });
-  }, []);
-
-  const create = (resource) => {
-    console.log("in create--", resource);
-    axios.post(baseUrl, resource).then((response) => {
-      setResources(...resources.concat(response.data));
-    });
-  };
-
-  const service = {
-    create,
-  };
-
-  return [resources, service];
-};
+import {useResource} from './hooks'
+import {useField} from './hooks'
 
 const App = () => {
   const content = useField("text");
@@ -45,6 +10,8 @@ const App = () => {
 
   const [notes, noteService] = useResource("http://localhost:3005/notes");
   const [persons, personService] = useResource("http://localhost:3005/persons");
+
+  console.log('xxx--', notes)
 
   const handleNoteSubmit = (event) => {
     event.preventDefault();
@@ -63,9 +30,9 @@ const App = () => {
         <input {...content} />
         <button>create</button>
       </form>
-      {notes.map((n) => (
+      {notes.length>0? notes.map((n) => (
         <p key={n.id}>{n.content}</p>
-      ))}
+      )):<p>loading....</p>}
 
       <h2>persons</h2>
       <form onSubmit={handlePersonSubmit}>
@@ -73,11 +40,11 @@ const App = () => {
         number <input {...number} />
         <button>create</button>
       </form>
-      {persons.map((n) => (
+      {persons? persons.map((n) => (
         <p key={n.id}>
           {n.name} {n.number}
         </p>
-      ))}
+      )):<p>loading....</p>}
     </div>
   );
 };

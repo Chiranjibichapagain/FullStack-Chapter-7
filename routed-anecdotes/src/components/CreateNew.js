@@ -1,21 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
 import { useField } from "../hooks/index";
 
 const CreateNew = ({ addNew, newNotification }) => {
   const history = useHistory();
 
-  const content = useField("text");
-  const author = useField("text");
-  const info = useField("text");
-  const reset = useField("reset", content, author, info);
+  const [fields, handleChange, handleReset] = useField({
+    content: "",
+    author: "",
+    url:""
+  })
+  
+  const {content, author, url} = fields
 
   const handleSubmit = (e) => {
     e.preventDefault();
     addNew({
-      content: content.value,
-      author: author.value,
-      info: author.value,
+      content,
+      author,
+      info:url,
       votes: 0,
     });
     history.push("/");
@@ -28,39 +31,39 @@ const CreateNew = ({ addNew, newNotification }) => {
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form onReset={handleReset} onSubmit={handleSubmit}>
         <div>
           content
           <input
             id="content"
-            type={content.type}
             name="content"
-            value={content.value}
-            onChange={content.onChange}
+            type="text"
+            value={content}
+            onChange={handleChange}
           />
         </div>
         <div>
           author
           <input
             id="author"
-            type={author.type}
             name="author"
-            value={author.value}
-            onChange={author.onChange}
+            type="text"
+            value={author}
+            onChange={handleChange}
           />
         </div>
         <div>
           url for more info
           <input
-            id="info"
-            type={info.type}
-            name="info"
-            value={info.value}
-            onChange={info.onChange}
+            id="url"
+            name="url"
+            type="text"
+            value={url}
+            onChange={handleChange}
           />
         </div>
         <button>create</button>
-        <input type={reset.type} value={reset.type} onClick={reset.onReset} />
+        <input type="reset" value="Reset" />
       </form>
     </div>
   );

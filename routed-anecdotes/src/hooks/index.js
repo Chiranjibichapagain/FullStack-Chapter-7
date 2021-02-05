@@ -1,23 +1,23 @@
 import { useState } from "react";
 
-export const useField = (type, content, author, info) => {
-  const [value, setvalue] = useState("");
+export const useField = (initialState) => {
+  const [fields, setValues] = useState(initialState);
 
-  const onChange = (event) => {
-    setvalue(event.target.value);
-  };
+  console.log('val--', fields)
+  const handleChange = (event) => {
+    setValues({
+      ...fields,
+      [event.target.id]: event.target.value
+    })
+  }
 
-  const onReset = (e) => {
-    e.preventDefault();
-    document.getElementById("content").value = "";
-    document.getElementById("author").value = "";
-    document.getElementById("info").value = "";
-  };
+  const handleReset = () => {
+    setValues(initialState)
+  }
 
-  return {
-    type,
-    value,
-    onChange,
-    onReset,
-  };
+  return [
+    fields,
+    handleChange,
+    handleReset
+  ];
 };
