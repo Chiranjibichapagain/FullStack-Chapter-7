@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import {useDispatch, useSelector} from 'react-redux'
+
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -6,9 +8,11 @@ import Notification from "./components/Notification";
 import Login from "./components/Login";
 import Newblog from "./components/Newblog";
 import Togglable from "./components/Togglable";
+import fetchBlogs from './redux/actions/blogActions'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const dispatch= useDispatch()
+  // const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
@@ -18,8 +22,10 @@ const App = () => {
   const blogFormRef = React.createRef();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    dispatch(fetchBlogs())
+  }, [dispatch]);
+  
+ const blogs= useSelector((state)=>state.blogREducer)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
