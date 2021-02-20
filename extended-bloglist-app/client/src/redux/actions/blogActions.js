@@ -1,9 +1,10 @@
 
-import { getAll, createBlog, deleteBlog, changeBlog } from '../../services/blogs'
+import { getAll, createBlog, deleteBlog, changeBlog} from '../../services/blogs'
 
 export const fetchBlogs = () => async (dispatch) => {
   try {
-    const data = await getAll();
+      const data = await getAll();
+      console.log('in-action', data)
     dispatch({ type: "GET_ALL_BLOGS", payload: data });
   } catch (error) {
     console.log(error.message)
@@ -12,7 +13,7 @@ export const fetchBlogs = () => async (dispatch) => {
 
 export const create = (newBlog) => async (dispatch) => {
   try {
-    await createBlog(newTodo)
+    await createBlog(newBlog)
     dispatch({ type: "ADD_BLOG", payload: newBlog });
   } catch (error) {
     console.log(error.message)

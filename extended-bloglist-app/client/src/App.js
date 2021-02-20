@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import {useDispatch, useSelector} from 'react-redux'
 
 import Blog from "./components/Blog";
-import blogService from "./services/blogs";
+import { getAll, createBlog, deleteBlog, changeBlog, setToken} from './services/blogs'
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import Login from "./components/Login";
 import Newblog from "./components/Newblog";
 import Togglable from "./components/Togglable";
-import fetchBlogs from './redux/actions/blogActions'
+import {fetchBlogs} from './redux/actions/blogActions'
 
 const App = () => {
   const dispatch= useDispatch()
@@ -25,14 +25,16 @@ const App = () => {
     dispatch(fetchBlogs())
   }, [dispatch]);
   
- const blogs= useSelector((state)=>state.blogREducer)
+  
+  const blogs = useSelector(state => state)
+  console.log('test-redux--', blogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
-      blogService.setToken(user.token);
+      setToken(user.token);
     }
   }, []);
 
@@ -41,7 +43,7 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password });
       window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
-      blogService.setToken(user.token);
+      setToken(user.token);
       setUser(user);
       setLoginMessage(`${user.name} is logged in`);
       setUsername("");
@@ -59,8 +61,8 @@ const App = () => {
 
   const createBlog = (newBlog) => {
     blogFormRef.current.toggleVisibility();
-    blogService.createBlog(newBlog).then((response) => {
-      setBlogs(response);
+    createBlog(newBlog).then((response) => {
+      console.log(response)
     });
   };
 
@@ -70,13 +72,12 @@ const App = () => {
       return { ...blog, likes: ++blog.likes };
     });
 
-    blogService.changeBlog(changedBlog[0]).then((response) => {
+    changeBlog(changedBlog[0]).then((response) => {
       const newData = blogs.map((blog) => {
         return blog.id === oldBlog.id
           ? { ...blog, likes: response.likes }
           : blog;
       });
-      setBlogs(newData);
     });
   };
 
@@ -86,9 +87,8 @@ const App = () => {
         `Are you sure you want to delete blog -"${oldBlog.title}"?`
       )
     ) {
-      blogService.deleteBlog(oldBlog.id).then((response) => {
+      deleteBlog(oldBlog.id).then((response) => {
         console.log("res------", response);
-        setBlogs(blogs.filter((blog) => blog.id !== oldBlog.id));
       });
       setError(`Blog "${oldBlog.title}" by ${oldBlog.author} is deleted`);
       setTimeout(() => {
