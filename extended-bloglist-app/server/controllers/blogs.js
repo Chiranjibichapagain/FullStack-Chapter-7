@@ -68,6 +68,7 @@ blogsRouter.put("/:id", async (req, res, next) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
+    comments:[]
   };
   await Blog.findByIdAndUpdate(req.params.id, newBlog, { new: true })
     .then((updatedNote) => {
@@ -75,5 +76,33 @@ blogsRouter.put("/:id", async (req, res, next) => {
     })
     .catch((error) => next(error));
 });
+
+
+blogsRouter.post('/:id/comments', async(req, res) => {
+  const { id } = req.params
+  const { comment } = req.body
+  const blog = await Blog.findById(id)
+  if (!blog) {
+    return res.status(401).json({error:'Blog not found'})
+  }
+  const blogComments=blog.comments
+  blogComments.push(comment)
+  console.log('testing--', blogComments)
+
+  const newBlog = {
+    title: blog.title,
+    author: blog.author,
+    url: blog.url,
+    likes: blog.likes,
+    comments: blogComments
+  }
+
+  await Blog.findByIdAndUpdate(id, newBlog, { new: true })
+    .then((updatedNote) => {
+      res.json(updatedNote.toJSON());
+    })
+    .catch((error) => next(error));
+
+})
 
 module.exports = blogsRouter;
