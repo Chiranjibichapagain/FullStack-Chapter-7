@@ -87,7 +87,6 @@ blogsRouter.post('/:id/comments', async(req, res) => {
   }
   const blogComments=blog.comments
   blogComments.push(comment)
-  console.log('testing--', blogComments)
 
   const newBlog = {
     title: blog.title,

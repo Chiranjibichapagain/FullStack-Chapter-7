@@ -26,7 +26,7 @@ const App = () => {
   }, [dispatch]);
   
   
-  const blogs = useSelector(state => state.blogs)
+  const blogs = useSelector(state => state)
   console.log('test-redux--', blogs)
 
   useEffect(() => {
