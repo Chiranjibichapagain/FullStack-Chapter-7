@@ -6,11 +6,10 @@ const baseUrl = "/api/users";
 //   token = `bearer ${newToken}`;
 // };
 
-const getAll = () => {
+export const getAll = () => {
   const request = axios.get(baseUrl);
   return request.then((response) => response.data);
 };
 
 
 
-export default { getAll};

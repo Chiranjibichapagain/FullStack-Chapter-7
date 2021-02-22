@@ -7,8 +7,8 @@ import notificationReducer from './reducers/notificationReducer'
 
 const reducer = combineReducers({
     blogs: blogReducer,
-    // users:userReducer,
-    // notifications: notificationReducer
+    users:userReducer,
+    notifications: notificationReducer
 });
 
 const store = createStore(reducer, applyMiddleware(thunk));

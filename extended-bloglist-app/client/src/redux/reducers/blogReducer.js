@@ -2,9 +2,7 @@
 const blogReducer = (state = [], action) => {
   switch (action.type) {
     case "GET_ALL_BLOGS":
-      const { payload } = action
-      state.push(...payload)
-      return state
+      return state.concat(action.payload)
       case "VOTE_BLOG":
         const changedBlog = action.payload
         return state.map((blog) => blog.id !== changedBlog.id ? blog : changedBlog)

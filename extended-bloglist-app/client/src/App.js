@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import {useDispatch, useSelector} from 'react-redux'
 
 import Blog from "./components/Blog";
-import { getAll, createBlog, deleteBlog, changeBlog, setToken} from './services/blogs'
-import loginService from "./services/login";
+import { setToken} from './services/blogs'
 import Notification from "./components/Notification";
 import Login from "./components/Login";
 import Newblog from "./components/Newblog";
 import Togglable from "./components/Togglable";
-import {fetchBlogs} from './redux/actions/blogActions'
+import { fetchBlogs, vote, blogDelete, create } from './redux/actions/blogActions'
+import { newNotification } from './redux/actions/notificationAction'
+import {fetchUsers, logUser} from './redux/actions/userActions'
 
 const App = () => {
   const dispatch= useDispatch()
-  // const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
@@ -26,44 +26,42 @@ const App = () => {
   }, [dispatch]);
   
   
-  const blogs = useSelector(state => state)
-  console.log('test-redux--', blogs)
+  const { blogs } = useSelector(state => state)
+  const { notifications } = useSelector(state => state)
+  const {loggedUser} = useSelector(state => state.users)
+  
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      setToken(user.token);
+    if (loggedUser) {
+      setUser(loggedUser);
+      setToken(loggedUser.token);
     }
-  }, []);
+  }, [loggedUser]);
+
+  console.log('try--', user)
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
-      setToken(user.token);
-      setUser(user);
-      setLoginMessage(`${user.name} is logged in`);
+      const user= await dispatch(logUser(username, password))
+      
+      if (user!==undefined) {
+      dispatch(newNotification(`${user.name} is logged in`));
       setUsername("");
       setPassword("");
       setTimeout(() => {
-        setLoginMessage(null);
+        dispatch(newNotification(null));
       }, 5000);
-    } catch (exception) {
-      setError("wrong Username or Password");
+    } else {
+      dispatch(newNotification("Login failed"))
       setTimeout(() => {
-        setError(null);
+        dispatch(newNotification(null))
       }, 5000);
     }
   };
 
   const createBlog = (newBlog) => {
     blogFormRef.current.toggleVisibility();
-    createBlog(newBlog).then((response) => {
-      console.log(response)
-    });
+    dispatch(create(newBlog))
   };
 
   const handleLikes = (oldBlog) => {
@@ -71,14 +69,8 @@ const App = () => {
     const changedBlog = findBlog.map((blog) => {
       return { ...blog, likes: ++blog.likes };
     });
-
-    changeBlog(changedBlog[0]).then((response) => {
-      const newData = blogs.map((blog) => {
-        return blog.id === oldBlog.id
-          ? { ...blog, likes: response.likes }
-          : blog;
-      });
-    });
+    console.log('in app--', changedBlog[0])
+    dispatch(vote(changedBlog[0]))
   };
 
   const handleDelete = (oldBlog) => {
@@ -87,12 +79,10 @@ const App = () => {
         `Are you sure you want to delete blog -"${oldBlog.title}"?`
       )
     ) {
-      deleteBlog(oldBlog.id).then((response) => {
-        console.log("res------", response);
-      });
-      setError(`Blog "${oldBlog.title}" by ${oldBlog.author} is deleted`);
+      dispatch(blogDelete(oldBlog.id))
+      dispatch(newNotification(`Blog "${oldBlog.title}" by ${oldBlog.author} is deleted`))
       setTimeout(() => {
-        setError("");
+        dispatch(newNotification(""));
       }, 7000);
     } else {
       return null;
@@ -124,7 +114,7 @@ const App = () => {
 
   const handleLogout = () => {
     setUser(null);
-    return window.localStorage.removeItem("loggedBloglistUser");
+    // return window.localStorage.removeItem("loggedBloglistUser");
   };
 
   const loginForm = () => (
@@ -148,7 +138,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification message={error} />
+      <Notification message={notifications} />
       {user === null ? (
         loginForm()
       ) : (
@@ -159,7 +149,7 @@ const App = () => {
             {blogs
               .sort((a, b) => b.likes - a.likes)
               .map((blog) => (
-                <li style={{listStyle:"none"}}>
+                <li key={blog.id} style={{listStyle:"none"}}>
                   <Blog
                     handleLikes={() => handleLikes(blog)}
                     handleDelete={() => handleDelete(blog)}
