@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import {BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom'
+
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 import Blog from "./components/Blog";
+import User from './components/User'
+import BlogViw from "./components/BlogView";
 import { setToken} from './services/blogs'
 import Notification from "./components/Notification";
 import Login from "./components/Login";
@@ -9,13 +16,13 @@ import Newblog from "./components/Newblog";
 import Togglable from "./components/Togglable";
 import { fetchBlogs, vote, blogDelete, create } from './redux/actions/blogActions'
 import { newNotification } from './redux/actions/notificationAction'
-import {fetchUsers, logUser} from './redux/actions/userActions'
+import { fetchUsers, logUser } from './redux/actions/userActions'
 
 const App = () => {
   const dispatch= useDispatch()
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZ…E5N30.G9e4OMOq_aLRP8kc02doA89tgHxodaRaDOkXH6nV3TQ", username: "Chiranjibi", name: "Chiranjibi"});
   const [error, setError] = useState(null);
   const [loginMessage, setLoginMessage] = useState(null);
 
@@ -23,14 +30,15 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchBlogs())
+    dispatch(fetchUsers())
   }, [dispatch]);
   
   
   const { blogs } = useSelector(state => state)
   const { notifications } = useSelector(state => state)
-  const {loggedUser} = useSelector(state => state.users)
+  const { loggedUser } = useSelector(state => state.users)
+  const {allUsers:users}= useSelector(state=>state.users)
   
-
   useEffect(() => {
     if (loggedUser) {
       setUser(loggedUser);
@@ -38,7 +46,6 @@ const App = () => {
     }
   }, [loggedUser]);
 
-  console.log('try--', user)
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -64,15 +71,7 @@ const App = () => {
     dispatch(create(newBlog))
   };
 
-  const handleLikes = (oldBlog) => {
-    const findBlog = blogs.filter((blog) => blog.id === oldBlog.id);
-    const changedBlog = findBlog.map((blog) => {
-      return { ...blog, likes: ++blog.likes };
-    });
-    console.log('in app--', changedBlog[0])
-    dispatch(vote(changedBlog[0]))
-  };
-
+ 
   const handleDelete = (oldBlog) => {
     if (
       window.confirm(
@@ -95,18 +94,12 @@ const App = () => {
     } else {
       return (
         <div style={{ display: "flex" }}>
-          <p style={{ fontWeight: "bolder" }}>{user.name}</p>
-          <button
-            style={{
-              background: "grey",
-              margin: "15px 3px 3px 3px",
-              borderStyle: "none",
-              maxHeight: "20px",
-            }}
+          <Typography style={{margin:'0px 20px'}} variant='h6'>{user.name}</Typography>
+          <Button variant='contained'
             onClick={handleLogout}
           >
             log out
-          </button>
+          </Button>
         </div>
       );
     }
@@ -114,7 +107,6 @@ const App = () => {
 
   const handleLogout = () => {
     setUser(null);
-    // return window.localStorage.removeItem("loggedBloglistUser");
   };
 
   const loginForm = () => (
@@ -135,23 +127,19 @@ const App = () => {
     </Togglable>
   );
 
-  return (
-    <div>
-      <h2>blogs</h2>
-      <Notification message={notifications} />
-      {user === null ? (
-        loginForm()
-      ) : (
-        <div>
-          {logMsg()}
-          {blogForm()}
+  const BlogList = () => {
+    return (
+      <div>
+        {user === null ? loginForm() :
+          <div>
+            <Typography style={{textAlign:'center', margin:'10px'}} variant='h5'>BLOGS</Typography>
+            {blogForm()}
           <ul className="blogList">
             {blogs
               .sort((a, b) => b.likes - a.likes)
               .map((blog) => (
                 <li key={blog.id} style={{listStyle:"none"}}>
                   <Blog
-                    handleLikes={() => handleLikes(blog)}
                     handleDelete={() => handleDelete(blog)}
                     key={blog.id}
                     blog={blog}
@@ -160,10 +148,62 @@ const App = () => {
                 </li>
               ))}
           </ul>
-        </div>
-      )}
+          </div>
+        }
+      </div>
+    )
+  } 
+
+  const UserList = () => {
+    return (
+      <div>
+         {user === null ? loginForm() :
+          <div>
+            <Typography style={{textAlign:'center', margin:'10px'}} variant='h5'>BLOGS</Typography>
+            {blogForm()}
+          <ul className="blogList">
+            {users
+              .map((user) => (
+                <User
+                  key={user.id}
+                    user={user}
+                  />
+              ))}
+          </ul>
+          </div>
+        }
+      </div>
+    )
+  } 
+
+
+  return (
+    <div>
+      <Router>
+      <Paper style={{padding:'10px 20px', display:'flex', justifyContent:'space-around', alignItems:'center'}} elevation="3" maxWidth="xl">
+        <Typography variant='h5'  >BLOG APP</Typography>
+        <Typography>
+          <Link to="/">
+          Blogs
+          </Link>
+          </Typography>
+        <Typography>
+          <Link to="/users">
+            Users
+          </Link>
+        </Typography>
+        {user!==null? logMsg():null}
+      <Notification message={notifications} />
+      </Paper>
+          <Switch>
+          <Route strict exact path='/' > <BlogList/> </Route>
+          <Route strict exact path='/users'> <UserList/> </Route>
+          <Route strict exact path='/blog/:blogId'> <BlogViw/> </Route>
+          </Switch>
+        </Router>
     </div>
   );
 };
+
 
 export default App;

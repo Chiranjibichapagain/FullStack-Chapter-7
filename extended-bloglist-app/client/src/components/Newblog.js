@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 const Newblog = ({ createBlog, setError }) => {
   const [title, setTitle] = useState("");
@@ -32,41 +34,44 @@ const Newblog = ({ createBlog, setError }) => {
     <div>
       <form onSubmit={handleCreateBlog}>
         <div>
-          Title
-          <input
+          <TextField
+            label='Title'
+            variant='standard'
             id="title"
             style={{ margin: "5px" }}
             name="title"
             value={title}
             type="text"
             onChange={({ target }) => setTitle(target.value)}
-          ></input>
+          ></TextField>
         </div>
         <div>
-          Author
-          <input
+          <TextField
+            label='Author'
+            variant='standard'
             id="author"
             style={{ margin: "5px" }}
             name="Author"
             value={author}
             type="text"
             onChange={({ target }) => setAuthor(target.value)}
-          ></input>
+          ></TextField>
         </div>
         <div>
-          URL
-          <input
+          <TextField
+            label='URL'
+            variant='standard'
             id="url"
             style={{ margin: "5px" }}
             name="URL"
             value={url}
             type="text"
             onChange={({ target }) => setUrl(target.value)}
-          ></input>
+          ></TextField>
         </div>
-        <button id="create" type="submit" onClick={handleCreateBlog}>
+        <Button style={{margin:'20px'}} variant='contained' id="create" type="submit" onClick={handleCreateBlog}>
           Create
-        </button>
+        </Button>
       </form>
     </div>
   );
