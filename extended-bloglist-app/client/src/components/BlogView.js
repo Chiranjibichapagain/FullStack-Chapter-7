@@ -27,7 +27,7 @@ const BlogView = () => {
   
   const handleComment = async (id) => {
     try {
-      await axios.post(`/api/blogs/${id}/comments`)
+      await axios.post(`/api/blogs/${id}/comments`, comment)
     } catch (error) {
       console.log(error)
     }
@@ -49,6 +49,11 @@ const BlogView = () => {
         <div>
           <TextField value={comment} onChange={(e)=>setComment(e.target.value)} variant='standard' label='Add comment' />
           <Button onClick={()=>handleComment(blog[0].id)} >Add</Button>
+        </div>
+        <div>
+          {blog[0].comments.map(comment => (
+            <li>{comment}</li>
+          ))}
         </div>
       </div>
     </Paper>

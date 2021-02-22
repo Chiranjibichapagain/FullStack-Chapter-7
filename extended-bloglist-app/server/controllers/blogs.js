@@ -81,6 +81,7 @@ blogsRouter.put("/:id", async (req, res, next) => {
 blogsRouter.post('/:id/comments', async(req, res) => {
   const { id } = req.params
   const { comment } = req.body
+  console.log('test', req.body)
   const blog = await Blog.findById(id)
   if (!blog) {
     return res.status(401).json({error:'Blog not found'})
