@@ -1,13 +1,14 @@
 import React, {useState} from "react";
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
 
-import {vote} from '../redux/actions/blogActions'
 import Paper from '@material-ui/core/Paper';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import Typography from '@material-ui/core/Typography';
 import { Button, IconButton, TextField } from "@material-ui/core";
+
+import { vote } from '../redux/actions/blogActions'
+import {commentBlog} from '../services/blogs'
 
 const BlogView = () => {
   const [comment, setComment] = useState('')
@@ -27,17 +28,16 @@ const BlogView = () => {
   
   const handleComment = async (id) => {
     try {
-      await axios.post(`/api/blogs/${id}/comments`, comment)
+      await commentBlog(id, {comment})
     } catch (error) {
       console.log(error)
     }
   }
 
-  console.log('test-comm', comment)
   return (
     <Paper variant='elevation' style={{width:'70%', backgroundColor:'lightblue', margin:'10px 0px', padding:'10px 20px', display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:'start'}}>
       <Typography variant='h4' >{blog[0].title}</Typography>
-      <a>{ blog[0].url}</a>
+      <a href={blog[0].url} >{ blog[0].url}</a>
       <Typography variant='subtitle1'>
         {`${blog[0].likes} Likes`}
         <IconButton onClick={handleLikes}>
@@ -46,11 +46,11 @@ const BlogView = () => {
       </Typography>
       <div>
         <Typography variant='h5' color='secondary' >Comments</Typography>
-        <div>
+        <div style={{display:'flex', alignItems:'center'}}>
           <TextField value={comment} onChange={(e)=>setComment(e.target.value)} variant='standard' label='Add comment' />
-          <Button onClick={()=>handleComment(blog[0].id)} >Add</Button>
+          <Button variant='contained' color='secondary' style={{margin:'20px'}} onClick={()=>handleComment(blog[0].id)} >Add</Button>
         </div>
-        <div>
+        <div style={{marginTop:'20px'}}>
           {blog[0].comments.map(comment => (
             <li>{comment}</li>
           ))}

@@ -1,8 +1,5 @@
-
 import { getAll } from '../../services/users'
 import { login } from '../../services/login'
-import {newNotification} from './notificationAction'
-
 
 export const fetchUsers = () => async (dispatch) => {
   try {

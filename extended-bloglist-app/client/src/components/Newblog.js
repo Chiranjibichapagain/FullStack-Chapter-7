@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import { useDispatch } from 'react-redux'
+
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
-const Newblog = ({ createBlog, setError }) => {
+import {newNotification} from '../redux/actions/notificationAction'
+
+const Newblog = ({ createBlog }) => {
+  const dispatch= useDispatch()
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -15,18 +20,13 @@ const Newblog = ({ createBlog, setError }) => {
       url: url,
     };
     createBlog(newBlog);
-    {
-      /*this is a function in app.js that do axios create, we are sending new blog from here */
-    }
-
+   
     setTitle("");
     setAuthor("");
     setUrl("");
-    setError(
-      `A new blog "${newBlog.title}" by- ${newBlog.author} is added to the list`
-    );
+    dispatch(newNotification(`A new blog "${newBlog.title}" by- ${newBlog.author} is added to the list`))
     setTimeout(() => {
-      setError(null);
+      dispatch(newNotification(null))
     }, 5000);
   };
 

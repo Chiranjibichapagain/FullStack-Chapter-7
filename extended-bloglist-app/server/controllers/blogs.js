@@ -12,7 +12,6 @@ blogsRouter.get("/", async (request, response) => {
     });
 });
 
-
 blogsRouter.post("/", async (request, response, next) => {
   try {
     const body = request.body;
@@ -24,10 +23,7 @@ blogsRouter.post("/", async (request, response, next) => {
       return response.status(401).json({ error: "token missing or invalid" });
     }
 
-    // const user = await User.findById('5ef73476c093f340848d1bbc');
     const user = await User.findById(decodedToken.id);
-    console.log('user---', user)
-
     const newBlog = {
       title: request.body.title,
       author: request.body.author,
@@ -78,7 +74,7 @@ blogsRouter.put("/:id", async (req, res, next) => {
 });
 
 
-blogsRouter.post('/:id/comments', async(req, res) => {
+blogsRouter.post("/:id/comments", async(req, res) => {
   const { id } = req.params
   const { comment } = req.body
   console.log('test', req.body)

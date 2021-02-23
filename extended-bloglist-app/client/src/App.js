@@ -8,23 +8,20 @@ import Button from '@material-ui/core/Button';
 
 import Blog from "./components/Blog";
 import User from './components/User'
-import BlogViw from "./components/BlogView";
-import { setToken} from './services/blogs'
 import Notification from "./components/Notification";
-import Login from "./components/Login";
+import BlogViw from "./components/BlogView";
 import Newblog from "./components/Newblog";
 import Togglable from "./components/Togglable";
-import { fetchBlogs, vote, blogDelete, create } from './redux/actions/blogActions'
+import Login from "./components/Login";
+
+import { setToken} from './services/blogs'
+import { fetchBlogs, blogDelete, create } from './redux/actions/blogActions'
 import { newNotification } from './redux/actions/notificationAction'
-import { fetchUsers, logUser } from './redux/actions/userActions'
+import { fetchUsers} from './redux/actions/userActions'
 
 const App = () => {
   const dispatch= useDispatch()
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState({token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZ…E5N30.G9e4OMOq_aLRP8kc02doA89tgHxodaRaDOkXH6nV3TQ", username: "Chiranjibi", name: "Chiranjibi"});
-  const [error, setError] = useState(null);
-  const [loginMessage, setLoginMessage] = useState(null);
+  const [user, setUser] = useState(null);
 
   const blogFormRef = React.createRef();
 
@@ -37,7 +34,8 @@ const App = () => {
   const { blogs } = useSelector(state => state)
   const { notifications } = useSelector(state => state)
   const { loggedUser } = useSelector(state => state.users)
-  const {allUsers:users}= useSelector(state=>state.users)
+  const { allUsers: users } = useSelector(state => state.users)
+  
   
   useEffect(() => {
     if (loggedUser) {
@@ -46,31 +44,10 @@ const App = () => {
     }
   }, [loggedUser]);
 
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-      const user= await dispatch(logUser(username, password))
-      
-      if (user!==undefined) {
-      dispatch(newNotification(`${user.name} is logged in`));
-      setUsername("");
-      setPassword("");
-      setTimeout(() => {
-        dispatch(newNotification(null));
-      }, 5000);
-    } else {
-      dispatch(newNotification("Login failed"))
-      setTimeout(() => {
-        dispatch(newNotification(null))
-      }, 5000);
-    }
-  };
-
   const createBlog = (newBlog) => {
     blogFormRef.current.toggleVisibility();
     dispatch(create(newBlog))
   };
-
  
   const handleDelete = (oldBlog) => {
     if (
@@ -95,7 +72,7 @@ const App = () => {
       return (
         <div style={{ display: "flex" }}>
           <Typography style={{margin:'0px 20px'}} variant='h6'>{user.name}</Typography>
-          <Button variant='contained'
+          <Button color='secondary' variant='contained'
             onClick={handleLogout}
           >
             log out
@@ -111,19 +88,13 @@ const App = () => {
 
   const loginForm = () => (
     <Togglable label="login">
-      <Login
-        setUsername={setUsername}
-        username={username}
-        setPassword={setPassword}
-        password={password}
-        handleLogin={handleLogin}
-      />
+      <Login/>
     </Togglable>
   );
 
   const blogForm = () => (
     <Togglable label="Create new blog" ref={blogFormRef}>
-      <Newblog createBlog={createBlog} setError={setError} />
+      <Newblog createBlog={createBlog} />
     </Togglable>
   );
 
@@ -180,15 +151,15 @@ const App = () => {
   return (
     <div>
       <Router>
-      <Paper style={{padding:'10px 20px', display:'flex', justifyContent:'space-around', alignItems:'center'}} elevation="3" maxWidth="xl">
+      <Paper style={{padding:'10px 20px', display:'flex', justifyContent:'space-around', alignItems:'center'}} elevation={3} >
         <Typography variant='h5'  >BLOG APP</Typography>
         <Typography>
-          <Link to="/">
+          <Link style={{textDecoration:'none', fontWeight:'bold'}} to="/">
           Blogs
           </Link>
           </Typography>
         <Typography>
-          <Link to="/users">
+          <Link style={{textDecoration:'none', fontWeight:'bold'}} to="/users">
             Users
           </Link>
         </Typography>
